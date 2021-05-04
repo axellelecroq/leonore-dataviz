@@ -1,0 +1,22 @@
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+
+select ?nom ?leonoreid ?bnfid ?datenaissance ?ville ?metier
+where {
+  ?person wdt:P640 ?leonoreid.
+  ?person wdt:P1559 ?nom.
+  ?person wdt:P268 ?bnfid.
+  ?person wdt:P106 ?occupation.
+  ?occupation rdfs:label ?metier
+    filter (lang(?metier)="fr").
+  ?person wdt:P569 ?datenaissance.
+  ?person wdt:P19 ?lieuNaissance.
+  ?lieuNaissance rdfs:label ?ville
+    filter (lang(?ville)="fr").
+}
