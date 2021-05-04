@@ -7,16 +7,28 @@ PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 
-select ?nom ?leonoreid ?bnfid ?datenaissance ?ville ?metier
+select ?nom ?leonoreid ?bnfid ?datenaissance ?ville ?datedeces ?villedc ?metier ?diplome
 where {
-  ?person wdt:P640 ?leonoreid.
-  ?person wdt:P1559 ?nom.
-  ?person wdt:P268 ?bnfid.
-  ?person wdt:P106 ?occupation.
+  ?person wdt:P640 ?leonoreid;
+          wdt:P1559 ?nom;
+          wdt:P268 ?bnfid;
+          wdt:P106 ?occupation;
+          wdt:P569 ?datenaissance;
+          wdt:P19 ?lieuNaissance;
+          wdt:P570 ?datedeces;
+          wdt:P20 ?lieudeces.
+          
   ?occupation rdfs:label ?metier
     filter (lang(?metier)="fr").
-  ?person wdt:P569 ?datenaissance.
-  ?person wdt:P19 ?lieuNaissance.
+  
   ?lieuNaissance rdfs:label ?ville
-    filter (lang(?ville)="fr").
+   filter (lang(?ville)="fr").
+  
+  ?lieudeces rdfs:label ?villedc
+    filter (lang(?villedc)="fr").
+  
+  #OPTIONAL{?person wdt:P512 ?niveauacademique}
+  #OPTIONAL{?niveauacademique rdfs:label ?diplome
+  #  filter (lang(?diplome)="fr")}
 }
+
