@@ -13,30 +13,36 @@ WHERE {
           wdt:P1559 ?nom.
           
   OPTIONAL{?person wdt:P106 ?occupation.
-           ?occupation rdfs:label ?metier.}
+           ?occupation rdfs:label ?metier.
+    filter (lang(?metier)="fr")}
   
   OPTIONAL{?person wdt:P268 ?bnfid.}
   
   OPTIONAL{?person wdt:P569 ?datenaissance.
            ?person wdt:P19 ?lieuNaissance.
            ?lieuNaissance wdt:P625 ?coordinatelieuN.
-           ?lieuNaissance rdfs:label ?ville.}
+           ?lieuNaissance rdfs:label ?ville.
+   filter (lang(?ville)="fr")}
   
   OPTIONAL{?person wdt:P570 ?datedeces.
            ?person wdt:P20 ?lieudeces.
            ?lieudeces wdt:P625 ?coordinatelieudc.
-           ?lieudeces rdfs:label ?villedc.}
+           ?lieudeces rdfs:label ?villedc.
+    filter (lang(?villedc)="fr")}
   
   OPTIONAL{?person wdt:P512 ?niveauacademique.
-           ?niveauacademique rdfs:label ?diplome.}
-  
-  SERVICE wikibase:label { 
-    bd:serviceParam wikibase:language "fr". 
-  }
+           ?niveauacademique rdfs:label ?diplome.
+          filter (lang(?diplome)="fr")}
 }
 GROUP BY ?nom ?leonoreid ?bnfid ?datenaissance ?ville ?coordinatelieuN ?datedeces ?villedc ?coordinatelieudc ?diplome
 
 -----
 
-Requête trop importante à découper en morceaux : temps d'exécution trop long.
+Requête trop importante à découper en morceaux suivant thématiques : temps d'exécution trop long.
+
+Remplacer les filter lang par :
+
+SERVICE wikibase:label { 
+    bd:serviceParam wikibase:language "fr".
+  }
 
