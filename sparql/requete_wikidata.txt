@@ -36,13 +36,19 @@ WHERE {
 }
 GROUP BY ?nom ?leonoreid ?bnfid ?datenaissance ?ville ?coordinatelieuN ?datedeces ?villedc ?coordinatelieudc ?diplome
 
------
+------------------------------------------------------------------------------------------------
 
-Requête trop importante à découper en morceaux suivant thématiques : temps d'exécution trop long.
+------> Requête trop importante : temps d'exécution trop long.
 
-Remplacer les filter lang par :
+TODO : 
+
+-Remplacer les filter lang par :
 
 SERVICE wikibase:label { 
     bd:serviceParam wikibase:language "fr".
   }
+
+- Utiliser un group_concat pour les diplômes et pour les identifiants de la BnF (parfois plusieurs) --> plus de doublons
+
+- Séparer les requêtes par thématiques pour résoudre pb du temps d'exécution trop long et puis jointures de tous les sets de données récupérés.
 
