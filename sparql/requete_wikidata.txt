@@ -7,46 +7,36 @@ PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 
-select ?nom ?leonoreid ?bnfid ?datenaissance ?ville ?coordinatelieuN ?datedeces ?villedc ?coordinatelieudc ?metier ?diplome
-where {
+SELECT ?nom ?leonoreid ?bnfid ?datenaissance ?ville ?coordinatelieuN ?datedeces ?villedc ?coordinatelieudc ?diplome (group_concat(DISTINCT ?metier;separator=" | ") as ?professions)
+WHERE {
   ?person wdt:P640 ?leonoreid;
-          wdt:P1559 ?nom;
+          wdt:P1559 ?nom.
           
   OPTIONAL{?person wdt:P106 ?occupation.
-           ?occupation rdfs:label ?metier
-    filter (lang(?metier)="fr").}
+           ?occupation rdfs:label ?metier.}
   
   OPTIONAL{?person wdt:P268 ?bnfid.}
   
   OPTIONAL{?person wdt:P569 ?datenaissance.
            ?person wdt:P19 ?lieuNaissance.
            ?lieuNaissance wdt:P625 ?coordinatelieuN.
-           ?lieuNaissance rdfs:label ?ville
-   filter (lang(?ville)="fr")}
+           ?lieuNaissance rdfs:label ?ville.}
   
   OPTIONAL{?person wdt:P570 ?datedeces.
            ?person wdt:P20 ?lieudeces.
            ?lieudeces wdt:P625 ?coordinatelieudc.
-           ?lieudeces rdfs:label ?villedc
-    filter (lang(?villedc)="fr").}
+           ?lieudeces rdfs:label ?villedc.}
   
   OPTIONAL{?person wdt:P512 ?niveauacademique.
-           ?niveauacademique rdfs:label ?diplome
-          filter (lang(?diplome)="fr").}
+           ?niveauacademique rdfs:label ?diplome.}
+  
+  SERVICE wikibase:label { 
+    bd:serviceParam wikibase:language "fr". 
+  }
 }
-
+GROUP BY ?nom ?leonoreid ?bnfid ?datenaissance ?ville ?coordinatelieuN ?datedeces ?villedc ?coordinatelieudc ?diplome
 
 -----
 
-Tests du nombre de résultats en fonction de ce qui est mis en optionnel :
-	17814  avec tous obligatoires sauf le niveau académique et le diplome
-	22005  bnfid en optionel > Certaines personnes de la base Léonore n'ont donc pas de documents à la BnF.
-	22092  lieuNaissance + dateNaissance +ville en optionel
-	27074  lieudeces, villedc, date deces en optionnel
--> donc vaut mieux mettre tout en optionnel sauf ?leonoreid et le ?nom afin de récupérer le plus de données
-
-À noter : comme la plupart ont eu plusieurs métiers, il ont autant de duplicat qu'ils ont de métier 
-enregistré dans wikidata. J'ai testé le distinct, ça n'a pas fait de différentes.	
-	Solutions possibles : 1. faire un group by (je sais pas si ça fonctionnerait)
-			      2. faire le nettoyage dans dataïku ?
+Requête trop importante à découper en morceaux : temps d'exécution trop long.
 
