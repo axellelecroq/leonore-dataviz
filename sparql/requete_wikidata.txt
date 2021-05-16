@@ -52,3 +52,89 @@ SERVICE wikibase:label {
 
 - Séparer les requêtes par thématiques pour résoudre pb du temps d'exécution trop long et puis jointures de tous les sets de données récupérés.
 
+------------------------------------------------ Requête pour faire les URI data bnf ------------------------------------------------
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+
+SELECT ?nom ?leonoreid ?bnfid
+WHERE {
+  ?person wdt:P640 ?leonoreid;
+          wdt:P1559 ?nom;
+          wdt:P268 ?bnfid.}
+
+
+------------------------------------------------ Requête pour récupérer les diplômes et les professions ------------------------------------------------
+
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+
+SELECT ?nom ?leonoreid ?bnfid (group_concat(DISTINCT ?diplome;separator=" | ") as ?diplomes) (group_concat(DISTINCT ?metier;separator=" | ") as ?professions)
+WHERE {
+  ?person wdt:P640 ?leonoreid;
+          wdt:P1559 ?nom.
+          
+ OPTIONAL{?person wdt:P106 ?occupation.
+           ?occupation rdfs:label ?metier.
+    filter (lang(?metier)="fr")}
+  
+  OPTIONAL{?person wdt:P268 ?bnfid.}
+  
+  OPTIONAL{?person wdt:P512 ?niveauacademique.
+           ?niveauacademique rdfs:label ?diplome.
+          filter (lang(?diplome)="fr")}
+}
+
+GROUP BY ?nom ?leonoreid ?bnfid
+
+
+
+------------------------------------------------------------------------------------------------
+Commentaire : si je supprimes le filtre "lang" pour SERVICE wikibase:label, le temps d'exécution devient trop long.
+
+
+
+-------- Requête pour récupérer les dates, lieux de naissance et décès et leur géolocalisation ---------------------
+
+
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+
+SELECT ?nom ?leonoreid ?bnfid ?datenaissance ?ville ?coordinatelieuN ?datedeces ?villedc ?coordinatelieudc
+WHERE {
+  ?person wdt:P640 ?leonoreid;
+          wdt:P1559 ?nom.
+  
+  OPTIONAL{?person wdt:P268 ?bnfid.}
+  
+  OPTIONAL{?person wdt:P569 ?datenaissance.
+           ?person wdt:P19 ?lieuNaissance.
+           ?lieuNaissance wdt:P625 ?coordinatelieuN.
+           ?lieuNaissance rdfs:label ?ville.
+   filter (lang(?ville)="fr")}
+  
+  OPTIONAL{?person wdt:P570 ?datedeces.
+           ?person wdt:P20 ?lieudeces.
+           ?lieudeces wdt:P625 ?coordinatelieudc.
+           ?lieudeces rdfs:label ?villedc.
+    filter (lang(?villedc)="fr")}
+}
+
+
