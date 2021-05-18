@@ -7,46 +7,150 @@ PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 
-select ?nom ?leonoreid ?bnfid ?datenaissance ?ville ?coordinatelieuN ?datedeces ?villedc ?coordinatelieudc ?metier ?diplome
-where {
+SELECT ?nom ?leonoreid ?bnfid ?datenaissance ?ville ?coordinatelieuN ?datedeces ?villedc ?coordinatelieudc ?diplome (group_concat(DISTINCT ?metier;separator=" | ") as ?professions)
+WHERE {
   ?person wdt:P640 ?leonoreid;
-          wdt:P1559 ?nom;
+          wdt:P1559 ?nom.
           
   OPTIONAL{?person wdt:P106 ?occupation.
-           ?occupation rdfs:label ?metier
-    filter (lang(?metier)="fr").}
+           ?occupation rdfs:label ?metier.
+    filter (lang(?metier)="fr")}
   
   OPTIONAL{?person wdt:P268 ?bnfid.}
   
   OPTIONAL{?person wdt:P569 ?datenaissance.
            ?person wdt:P19 ?lieuNaissance.
            ?lieuNaissance wdt:P625 ?coordinatelieuN.
-           ?lieuNaissance rdfs:label ?ville
+           ?lieuNaissance rdfs:label ?ville.
    filter (lang(?ville)="fr")}
   
   OPTIONAL{?person wdt:P570 ?datedeces.
            ?person wdt:P20 ?lieudeces.
            ?lieudeces wdt:P625 ?coordinatelieudc.
-           ?lieudeces rdfs:label ?villedc
-    filter (lang(?villedc)="fr").}
+           ?lieudeces rdfs:label ?villedc.
+    filter (lang(?villedc)="fr")}
   
   OPTIONAL{?person wdt:P512 ?niveauacademique.
-           ?niveauacademique rdfs:label ?diplome
-          filter (lang(?diplome)="fr").}
+           ?niveauacademique rdfs:label ?diplome.
+          filter (lang(?diplome)="fr")}
+}
+GROUP BY ?nom ?leonoreid ?bnfid ?datenaissance ?ville ?coordinatelieuN ?datedeces ?villedc ?coordinatelieudc ?diplome
+
+------------------------------------------------------------------------------------------------
+
+------> Requête trop importante : temps d'exécution trop long.
+
+TODO : 
+
+-Remplacer les filter lang par :
+
+SERVICE wikibase:label { 
+    bd:serviceParam wikibase:language "fr".
+  }
+
+- Utiliser un group_concat pour les diplômes et pour les identifiants de la BnF (parfois plusieurs) --> plus de doublons
+
+- Séparer les requêtes par thématiques pour résoudre pb du temps d'exécution trop long et puis jointures de tous les sets de données récupérés.
+
+
+------------------------------------------------ Requête pour faire les dédoublonner les noms (suivi de l'utilisation d'une regex sur Dataiku) ------------------------------------------------
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+
+SELECT ?leonoreid (group_concat(DISTINCT ?nom;separator=" | ") as ?noms)
+WHERE {
+  ?person wdt:P640 ?leonoreid;
+          wdt:P1559 ?nom.}
+
+GROUP BY ?leonoreid
+
+
+------------------------------------------------ Requête pour faire les URI data bnf ------------------------------------------------
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+
+SELECT ?leonoreid  (group_concat(DISTINCT ?bnfid;separator=" |") as ?bnfids)
+WHERE {
+  ?person wdt:P640 ?leonoreid;
+          wdt:P268 ?bnfid.}
+
+GROUP BY ?leonoreid
+
+
+------------------------------------------------ Requête pour récupérer les diplômes et les professions ------------------------------------------------
+
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+
+SELECT ?nom ?leonoreid(group_concat(DISTINCT ?diplome;separator=" | ") as ?diplomes) (group_concat(DISTINCT ?metier;separator=" | ") as ?professions)
+WHERE {
+  ?person wdt:P640 ?leonoreid;
+          wdt:P1559 ?nom.
+          
+ OPTIONAL{?person wdt:P106 ?occupation.
+           ?occupation rdfs:label ?metier.
+    filter (lang(?metier)="fr")}
+  
+  OPTIONAL{?person wdt:P512 ?niveauacademique.
+           ?niveauacademique rdfs:label ?diplome.
+          filter (lang(?diplome)="fr")}
 }
 
+GROUP BY ?nom ?leonoreid
 
------
 
-Tests du nombre de résultats en fonction de ce qui est mis en optionnel :
-	17814  avec tous obligatoires sauf le niveau académique et le diplome
-	22005  bnfid en optionel > Certaines personnes de la base Léonore n'ont donc pas de documents à la BnF.
-	22092  lieuNaissance + dateNaissance +ville en optionel
-	27074  lieudeces, villedc, date deces en optionnel
--> donc vaut mieux mettre tout en optionnel sauf ?leonoreid et le ?nom afin de récupérer le plus de données
 
-À noter : comme la plupart ont eu plusieurs métiers, il ont autant de duplicat qu'ils ont de métier 
-enregistré dans wikidata. J'ai testé le distinct, ça n'a pas fait de différentes.	
-	Solutions possibles : 1. faire un group by (je sais pas si ça fonctionnerait)
-			      2. faire le nettoyage dans dataïku ?
+------------------------------------------------------------------------------------------------
+Commentaire : si je supprime le filtre "lang" pour SERVICE wikibase:label, le temps d'exécution devient trop long.
+
+
+
+-------- Requête pour récupérer les dates, lieux de naissance et décès et leur géolocalisation ---------------------
+
+
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+
+SELECT ?nom ?leonoreid ?datenaissance ?ville ?coordinatelieuN ?datedeces ?villedc ?coordinatelieudc
+WHERE {
+  ?person wdt:P640 ?leonoreid;
+          wdt:P1559 ?nom.
+  
+  OPTIONAL{?person wdt:P569 ?datenaissance.
+           ?person wdt:P19 ?lieuNaissance.
+           ?lieuNaissance wdt:P625 ?coordinatelieuN.
+           ?lieuNaissance rdfs:label ?ville.
+   filter (lang(?ville)="fr")}
+  
+  OPTIONAL{?person wdt:P570 ?datedeces.
+           ?person wdt:P20 ?lieudeces.
+           ?lieudeces wdt:P625 ?coordinatelieudc.
+           ?lieudeces rdfs:label ?villedc.
+    filter (lang(?villedc)="fr")}
+}
+
 
