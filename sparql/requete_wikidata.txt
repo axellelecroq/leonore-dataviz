@@ -52,6 +52,25 @@ SERVICE wikibase:label {
 
 - Séparer les requêtes par thématiques pour résoudre pb du temps d'exécution trop long et puis jointures de tous les sets de données récupérés.
 
+
+------------------------------------------------ Requête pour faire les dédoublonner les noms (suivi de l'utilisation d'une regex sur Dataiku) ------------------------------------------------
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+
+SELECT ?leonoreid (group_concat(DISTINCT ?nom;separator=" | ") as ?noms)
+WHERE {
+  ?person wdt:P640 ?leonoreid;
+          wdt:P1559 ?nom.}
+
+GROUP BY ?leonoreid
+
+
 ------------------------------------------------ Requête pour faire les URI data bnf ------------------------------------------------
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -62,13 +81,12 @@ PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 
-SELECT ?nom ?leonoreid  (group_concat(DISTINCT ?bnfid;separator=" | ") as ?bnfids)
+SELECT ?leonoreid  (group_concat(DISTINCT ?bnfid;separator=" |") as ?bnfids)
 WHERE {
   ?person wdt:P640 ?leonoreid;
-          wdt:P1559 ?nom;
           wdt:P268 ?bnfid.}
 
-GROUP BY ?nom ?leonoreid
+GROUP BY ?leonoreid
 
 
 ------------------------------------------------ Requête pour récupérer les diplômes et les professions ------------------------------------------------
