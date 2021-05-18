@@ -100,7 +100,7 @@ PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 
-SELECT ?nom ?leonoreid(group_concat(DISTINCT ?diplome;separator=" | ") as ?diplomes) (group_concat(DISTINCT ?metier;separator=" | ") as ?professions)
+SELECT ?leonoreid(group_concat(DISTINCT ?diplome;separator=" | ") as ?diplomes) (group_concat(DISTINCT ?metier;separator=" | ") as ?professions)
 WHERE {
   ?person wdt:P640 ?leonoreid;
           wdt:P1559 ?nom.
@@ -114,7 +114,7 @@ WHERE {
           filter (lang(?diplome)="fr")}
 }
 
-GROUP BY ?nom ?leonoreid
+GROUP BY ?leonoreid
 
 
 
@@ -135,7 +135,7 @@ PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 
-SELECT ?nom ?leonoreid ?datenaissance ?ville ?coordinatelieuN ?datedeces ?villedc ?coordinatelieudc
+SELECT ?leonoreid ?datenaissance ?ville ?coordinatelieuN ?datedeces ?villedc ?coordinatelieudc
 WHERE {
   ?person wdt:P640 ?leonoreid;
           wdt:P1559 ?nom.
