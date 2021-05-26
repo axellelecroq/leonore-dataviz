@@ -178,3 +178,22 @@ WHERE {
         ?payscode rdfs:label ?pays.
            filter (lang(?pays)="fr")
 }
+
+
+
+-------------------- Récupérer les images 
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+
+SELECT DISTINCT ?leonoreid (group_concat(DISTINCT ?image;separator=" | ") as ?images)
+WHERE {
+  ?person wdt:P640 ?leonoreid;
+          wdt:P18 ?image.
+}
+GROUP BY ?leonoreid
