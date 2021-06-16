@@ -2,7 +2,7 @@
 
 Ce projet a été réalisé par [Axelle lecroq](https://github.com/axellelecroq) et [Léa Perissier](https://github.com/leaprs) dans le cadre du cours _Données, Web de données et exploitation_ au sein du master 2 TNAH de l'École nationale des chartes. 
 Il consiste en la réalisation d'une analyse prosopographique des récipiendaires de la Légion d'honneur via des visualisation de données. Pour davantage de renseignements sur les contraintes de ce projet, veuillez vous référer au fichier concernant [les consignes](https://github.com/axellelecroq/leonore-dataviz/blob/main/consignes.md).
-Le traitement des données a été réalisé grâce à _Dataiku_ et les visualisations sur _Tableau_.
+Le traitement des données a été réalisé grâce à _Dataiku_ et les visualisations sur _Tableau_. Un compte rendu détaillé des étapes de notre travail est diponible à travers notre [feuille de route](https://github.com/axellelecroq/leonore-dataviz/blob/main/feuille_de_route.md).
 
 # Structure du projet
 
@@ -20,7 +20,7 @@ leonore-dataviz
     └── metadonnes_leonore.zip --> jeu de données initial des Archives Nationales
 ```
 
-# Dataviz
+# Visualisations
 
 Les différents tableaux de bord résultant du traitement des données des récipiendaires :
 
