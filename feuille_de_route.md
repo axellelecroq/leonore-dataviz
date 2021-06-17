@@ -34,6 +34,9 @@ Afin de récupérer les œuvres des récipiendaires via Data BnF, les identifian
 De cette manière, les œuvres des récipiendaires ont été apportées dans un fichier csv. Nous avons choisi volontairement de structurer notre fichier sous le format une ligne = une œuvre d’un récipiendaire. 
 En effet, le fait de sauvegarder les doublons sur les identifiants Léonore et les noms permettra leur calcul pour une visualisation qui présentera les auteurs les plus prolifiques.
 
+Ci-dessous un aperçu du jeu de données correspondant à la bibliographie construit sur _Dataiku_ :
+![Biblio](documentation/biblio_dataiku.png)
+
 ## Enrichissement des données de géolocalisation grâce à Wikidata
 
 Cet enrichissement des données géographiques a été décidée suite à un constat : les lacunes des données. Suite à une requête SPARQL sur Wikidata, nous avons récupéré les géolocalisation des lieux de naissances de récipendiaires représentés sur Wikidata. En effet, un pourcentage marginal des récipiendaires bénéficient d’un identifiant Wikidata et les coordonnées de naissance ainsi rapportées étaient trop faibles pour envisager une visualisation pertinente des lieux de naissance. Grâce à cette première requête, seuls 4% des récipendaires possédaient une géolocalisation pour son lieu de naissance. 
@@ -41,6 +44,9 @@ Cet enrichissement des données géographiques a été décidée suite à un con
 Ainsi, nous avons procédé à différentes requêtes afin de rapporter un maximum de données géographiques. Nous avons tout d’abord récupéré toutes les communes de France puis les capitales du monde et les villes de certains pays qui nous semblaient apparaître de manière récurrente dans le set de données des Archives Nationales, à savoir : les États-Unis, Vietnam, Inde, Maroc, Algérie, Tunisie.
 
 Ces données rapportées ont ensuite été traitées dans Dataiku, notamment pour supprimer les coordonnées invalides et pour supprimer les doublons de coordonnées. Puis, différents empilements (_stack_) de ces données ont été effectués afin de permettre une jointure avec notre fichier initial. Cette dernière a porté sur les colonnes “villeNaissance” et “dpt/PaysNaissance” déjà existantes dans notre jeu de donnée original. Cet enrichissement a permis de passer de 4% de coordonnées géographiques sur les lieux de naissance à environ 80%.
+
+Ci-desous un aperçu du jeu de données initial enrichi sur _Daitaku_ : 
+![Data](documentation/data_dataiku.png)
 
 ## Création des visualisations grâce au logiciel Tableau
 
@@ -75,7 +81,10 @@ Ces visualisations sont disponibles en cliquant sur [ce lien](https://public.tab
 ## Composition finale du mashup de données
 
 Notre rendu final est constitué :
-- de l’export de notre projet Dataiku
-- des liens vers les différents tableaux de bord sur Tableau en ligne
+- de l’export de notre projet _Dataiku_ 
 - de nos jeu de données finaux (jeu de donnée initial enrichi sur les récipiendaires et bibliographie)
+- des liens vers les différents tableaux de bord sur Tableau en ligne
 - des fichiers et du script python ayant été utilisés uniquement pour les visualisations
+
+Pour conclure, voici le flow final de notre mashup de données sur _Dataiku_ :
+![Flow](documentation/flow_dataiku.png)
