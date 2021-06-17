@@ -1,6 +1,8 @@
 # Mashup de données à partir de la base Léonore
 # Liste des étapes de réalisation
 
+> Veuillez retrouver sur le dépôt, les requêtes utilisées dans [wikidata](sparql/requete_wikidata.md) et la [BnF](sparql/requete_bnf.md).
+
 ## Récupération et nettoyage du jeu de données de la base Léonore des Archives Nationales
 
 Le jeu de données de la base Léonore des AN se situe à la base de notre projet, et a été constamment enrichi par d’autres jeux de données. Dans cette explication nous l’appelerons jeu de données de base ou initial.
